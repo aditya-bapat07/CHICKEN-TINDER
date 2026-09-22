@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String?
+  name          String
+  boredomProfile Json?         // { energy, budget, social }
+  streakRejects Int            @default(0) // resets on accept
+  createdAt     DateTime       @default(now())
+
+  apiKeys       ApiKey[]
+  swipes        Swipe[]
+  matches       Match[]
+  sessions      SwipeSession[]
+}
+
+model ApiKey {
+  id        String    @id @default(uuid())
+  keyHash   String    @unique // sha256 of raw key
+  userId    String
+  label     String?   // "phone", "laptop"
+  lastUsed  DateTime?
+  revoked   Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String   // outdoor, creative, social, solo, fitness...
+  energy      Int      // 1-5
+  budget      Int      // 1-5 (1=free, 5=expensive)
+  social      Int      // 1-5 (1=solo, 5=party)
+  durationMin Int
+  embedding   String?  // vector embeddings stored as JSON/string if needed
+  createdAt   DateTime @default(now())
+
+  swipes      Swipe[]
+  matches     Match[]
+}
+
+model SwipeSession {
+  id        String    @id @default(uuid())
+  userId    String
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  forcedAt  Int?      // swipe # when force triggered
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  swipes    Swipe[]
+}
+
+model Swipe {
+  id         String       @id @default(uuid())
+  userId     String
+  activityId String
+  sessionId  String
+  direction  String       // "like" | "reject" | "forced_accept"
+  createdAt  DateTime     @default(now())
+
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity   Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  session    SwipeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, activityId]) // no double-swiping
+}
+
+model Match {
+  id          String    @id @default(uuid())
+  userId      String
+  activityId  String
+  status      String    // "pending" | "done" | "skipped"
+  shareToken  String?   @unique // for friend invites
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}
