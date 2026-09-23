@@ -12,7 +12,7 @@ function run(args) {
     throw new Error(`Command failed (${result.status}): ${args[0]}`);
 }
 try {
-  const schema = readFileSync("prisma/schema.prisma", "utf8").replace(
+  const schema = readFileSync("database/prisma/schema.prisma", "utf8").replace(
     "file:./dev.db",
     url,
   );
@@ -25,7 +25,7 @@ try {
     join(dir, "schema.prisma"),
     "--skip-generate",
   ]);
-  run(["--import", "tsx", "prisma/seed.ts"]);
+  run(["--import", "tsx", "database/prisma/seed.ts"]);
   if (process.argv.includes("--browser"))
     run(["node_modules/@playwright/test/cli.js", "test"]);
   else run(["--import", "tsx", "scripts/test-api.ts"]);

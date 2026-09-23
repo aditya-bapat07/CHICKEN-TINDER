@@ -13,7 +13,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "node dist/server.js",
+    command: "node backend/dist/server.js",
     url: "http://127.0.0.1:3100/health",
     reuseExistingServer: false,
     env: { PORT: "3100", NODE_ENV: "test" },

@@ -1,4 +1,4 @@
-import { buildApp } from "../src/server.js";
+import { buildApp } from "../backend/src/server.js";
 
 async function runDemo() {
   process.env.NODE_ENV = "test"; // prevent server listen collision

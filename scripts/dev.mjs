@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 const processes = [
-  spawn(process.execPath, ["--import", "tsx", "--watch", "src/server.ts"], {
+  spawn(process.execPath, ["--import", "tsx", "--watch", "backend/src/server.ts"], {
     stdio: "inherit",
   }),
   spawn(

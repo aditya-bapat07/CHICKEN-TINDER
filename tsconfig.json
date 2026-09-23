@@ -7,8 +7,8 @@
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "outDir": "./backend/dist",
+    "rootDir": "./backend/src"
   },
-  "include": ["src/**/*"]
+  "include": ["backend/src/**/*"]
 }

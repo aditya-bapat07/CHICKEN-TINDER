@@ -14,7 +14,7 @@ npm run dev
 
 Open **http://localhost:5173**. This starts the frontend and API together. The API runs at **http://localhost:3000**, with interactive documentation at **http://localhost:3000/docs**. Vite proxies `/api` and `/docs` to the API.
 
-The existing local database is `prisma/dev.db`. Setup applies the schema and adds missing seed activities without deleting existing users, matches, or swipes. PostgreSQL and the legacy `docker-compose.yml` are not needed for this SQLite version.
+The existing local database is `database/prisma/dev.db`. Setup applies the schema and adds missing seed activities without deleting existing users, matches, or swipes. PostgreSQL and the legacy `docker-compose.yml` are not needed for this SQLite version.
 
 ## Production build
 
@@ -123,16 +123,15 @@ npm test
 npm run test:e2e
 ```
 
-Tests create, seed, and remove a separate temporary SQLite database. They do not modify `prisma/dev.db`. API checks cover authentication, password changes, key ownership/revocation, quiz validation, sessions, duplicate/ended swipes, matches, sharing, and leaderboard counts. Browser tests cover desktop/mobile discovery, the full account journey, and actionable error states.
+Tests create, seed, and remove a separate temporary SQLite database. They do not modify `database/prisma/dev.db`. API checks cover authentication, password changes, key ownership/revocation, quiz validation, sessions, duplicate/ended swipes, matches, sharing, and leaderboard counts. Browser tests cover desktop/mobile discovery, the full account journey, and actionable error states.
 
 The Playwright configuration uses installed Google Chrome. On a machine without Chrome, install it or change `channel: 'chrome'` to use a Playwright-installed Chromium. Browser tests use port 3100. Screenshots and failure traces are written to `test-results/`.
 
 ## Project map
 
-- `frontend/src/`: responsive app, pages, API client, and authentication context.
-- `src/routes/`: API endpoints, available under `/api` and legacy paths for existing clients.
-- `src/services/`: activity selection, swipe transactions, and match management.
-- `prisma/`: SQLite schema and repeatable activity seed.
+- `frontend/`: React application, pages, API client, and authentication context.
+- `backend/src/`: Fastify API, routes, services, authentication, and database access.
+- `database/prisma/`: SQLite schema, local database, and repeatable activity seed.
 - `tests/`: end-to-end browser checks.
 - `scripts/`: local development and isolated API test runners.
 

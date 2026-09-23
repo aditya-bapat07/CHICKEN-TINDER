@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { buildApp } from "../src/server.js";
-import { db } from "../src/lib/db.js";
+import { buildApp } from "../backend/src/server.js";
+import { db } from "../backend/src/lib/db.js";
 async function runTests() {
   const app = await buildApp();
   let count = 0;
