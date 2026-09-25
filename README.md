@@ -126,11 +126,14 @@ npm run build
 npm run test:deployment
 npm test
 npm run test:e2e
+npm run test:mobile
 ```
 
 Set `TEST_DATABASE_URL` to a disposable PostgreSQL database (the local `.env.example` supplies one). Tests create and remove a unique schema, apply real migrations, and check that seeding twice preserves activity IDs. They never use `DATABASE_URL` as an implicit test target. API checks cover authentication, password changes, key ownership/revocation, quiz validation, sessions, duplicate/ended swipes, matches, sharing, and leaderboard counts. Browser tests cover desktop/mobile discovery, the full account journey, and actionable error states.
 
 The Playwright configuration uses installed Google Chrome locally and bundled Chromium in CI. GitHub Actions installs Chromium and runs the full suite with PostgreSQL 16 and Node 24. Browser tests use port 3100. Screenshots and failure traces are written to `test-results/`.
+
+The independent layout suite checks phone, tablet, and desktop widths in Chrome and WebKit (Safari's engine), using a fixed catalog without database access. Install WebKit once with `npx playwright install webkit`, then run `npm run test:mobile`. It checks card readability, navigation touch targets, dialog bounds, and form text size to avoid iOS focus zoom. Mobile cards use compact illustrations and one column; category artwork uses SVG so it renders consistently across platforms.
 
 ## Project map
 

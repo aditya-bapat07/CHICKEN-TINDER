@@ -33,7 +33,8 @@ jobs:
       - run: npm ci && npm --prefix frontend ci
       - run: npm run build
       - run: npm run test:deployment
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm test
       - run: node scripts/run-tests.mjs --browser
+      - run: npx playwright test --config playwright.mobile.config.ts
       - run: npm audit --audit-level=moderate && npm --prefix frontend audit --audit-level=moderate

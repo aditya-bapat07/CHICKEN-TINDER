@@ -1,6 +1,32 @@
 import { useEffect, useState, ReactNode, useRef } from "react";
-export function Icon({ name, size = 20 }: { name: string; size?: number }) {
+export function Icon({
+  name,
+  size = 20,
+}: {
+  name: string;
+  size?: number | string;
+}) {
   const paths: Record<string, ReactNode> = {
+    spark: (
+      <path
+        d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M5.6 18.4 18.4 5.6"
+        strokeWidth="3"
+      />
+    ),
+    tree: <path d="m12 2-7 9h4l-5 6h7v5h2v-5h7l-5-6h4z" />,
+    smile: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M8 9h.01M16 9h.01M8 14a4.5 4.5 0 0 0 8 0" />
+      </>
+    ),
+    moon: <path d="M20.5 14.3A9 9 0 0 1 9.7 3.5a9 9 0 1 0 10.8 10.8Z" />,
+    sparkle: <path d="m12 2 3 7 7 3-7 3-3 7-3-7-7-3 7-3z" />,
+    game: (
+      <>
+        <path d="M7 7h10a4 4 0 0 1 4 3l1 7a2 2 0 0 1-3.4 1.7L15 16H9l-3.6 2.7A2 2 0 0 1 2 17l1-7a4 4 0 0 1 4-3ZM7 10v4M5 12h4M16 11h.01M19 13h.01" />
+      </>
+    ),
     discover: (
       <>
         <path d="m16 8-3 5-5 3 3-5z" />
@@ -97,16 +123,16 @@ export function Brand() {
 }
 export const categories: Record<
   string,
-  { symbol: string; label: string; color: string }
+  { icon: string; label: string; color: string }
 > = {
-  outdoor: { symbol: "↟", label: "Outdoors", color: "#cce3cc" },
-  creative: { symbol: "✳", label: "Creative", color: "#f0d6c8" },
-  fitness: { symbol: "ϟ", label: "Get moving", color: "#d8d9ed" },
-  social: { symbol: "☻", label: "Be social", color: "#f4df9e" },
-  solo: { symbol: "☾", label: "Me time", color: "#cedfe8" },
-  learning: { symbol: "✧", label: "Learn something", color: "#d4dfb9" },
-  gaming: { symbol: "✜", label: "Play a little", color: "#e8cee1" },
-  relaxation: { symbol: "☾", label: "Unwind", color: "#cedfe8" },
+  outdoor: { icon: "tree", label: "Outdoors", color: "#cce3cc" },
+  creative: { icon: "spark", label: "Creative", color: "#f0d6c8" },
+  fitness: { icon: "bolt", label: "Get moving", color: "#d8d9ed" },
+  social: { icon: "smile", label: "Be social", color: "#f4df9e" },
+  solo: { icon: "moon", label: "Me time", color: "#cedfe8" },
+  learning: { icon: "sparkle", label: "Learn something", color: "#d4dfb9" },
+  gaming: { icon: "game", label: "Play a little", color: "#e8cee1" },
+  relaxation: { icon: "moon", label: "Unwind", color: "#cedfe8" },
 };
 export function Art({
   category,
@@ -125,7 +151,9 @@ export function Art({
       <div className="art-orbit" />
       <div className="art-orbit second" />
       <span className="art-star">✦</span>
-      <span className="art-symbol">{c.symbol}</span>
+      <span className="art-symbol">
+        <Icon name={c.icon} size="1em" />
+      </span>
       <span className="art-caption">A LITTLE OUT OF THE ORDINARY</span>
     </div>
   );

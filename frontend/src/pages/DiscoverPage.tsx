@@ -150,15 +150,13 @@ export default function DiscoverPage({
               <button
                 className="explore-scroll"
                 onClick={() => {
-                  document
-                    .getElementById("ideas")
-                    ?.scrollIntoView({
-                      behavior:
-                        document.documentElement.dataset.motion === "off"
-                          ? "instant"
-                          : "smooth",
-                      block: "start",
-                    });
+                  document.getElementById("ideas")?.scrollIntoView({
+                    behavior:
+                      document.documentElement.dataset.motion === "off"
+                        ? "instant"
+                        : "smooth",
+                    block: "start",
+                  });
                   document
                     .getElementById("activity-search")
                     ?.focus({ preventScroll: true });
@@ -173,7 +171,9 @@ export default function DiscoverPage({
             <div className="hero-art" aria-hidden="true">
               <div className="hero-circle" />
               <div className="hero-orbit" />
-              <span className="hero-spark">✳</span>
+              <span className="hero-spark">
+                <Icon name="spark" size="1em" />
+              </span>
               <div className="mini-card back">
                 <span>☀</span>
                 <strong>
@@ -291,7 +291,9 @@ export default function DiscoverPage({
                 className={`category ${category === key ? "active" : ""}`}
                 onClick={() => setCategory(key)}
               >
-                <span>{c.symbol}</span>
+                <span>
+                  <Icon name={c.icon} size="1em" />
+                </span>
                 {c.label}
               </button>
             ))}
@@ -415,7 +417,7 @@ export default function DiscoverPage({
             <p>No perfect plan required. Just a little curiosity.</p>
           </div>
           <div className="story-flower" aria-hidden="true">
-            ✳
+            <Icon name="spark" size="1em" />
           </div>
           <div className="how-steps">
             <Link to="/quiz" className="how-step">

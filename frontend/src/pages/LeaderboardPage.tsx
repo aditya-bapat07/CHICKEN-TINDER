@@ -1,6 +1,6 @@
 import { getLeaderboard } from "../api";
 import { useAuth } from "../context/AuthContext";
-import { Empty, Loading, LoadError, useLoad } from "../components/UI";
+import { Empty, Icon, Loading, LoadError, useLoad } from "../components/UI";
 export default function LeaderboardPage() {
   const list = useLoad(getLeaderboard);
   const { user } = useAuth();
@@ -14,7 +14,9 @@ export default function LeaderboardPage() {
         <span className="large-emoji">♜</span>
       </div>
       <section className="leaderboard-intro">
-        <span>✳</span>
+        <span>
+          <Icon name="spark" size="1em" />
+        </span>
         <div>
           <h2>A little nudge. A lot of possibility.</h2>
           <p>

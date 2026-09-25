@@ -75,7 +75,9 @@ export default function AuthPage() {
             Or something that surprises you.
           </p>
           <div className="auth-illustration">
-            <span className="big-spark">✳</span>
+            <span className="big-spark">
+              <Icon name="spark" size="1em" />
+            </span>
             <div className="floating-note">
               Less overthinking.
               <br />

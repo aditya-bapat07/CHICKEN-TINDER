@@ -169,7 +169,9 @@ export default function ScrollEffects() {
               : "Pause animations"
         }
       >
-        <span aria-hidden="true">{reduced ? "Ⅱ" : "✳"}</span>
+        <span aria-hidden="true">
+          {reduced ? "Ⅱ" : <Icon name="spark" size="1em" />}
+        </span>
         <span className="motion-toggle-label">
           {reduced ? "Motion off" : "Motion on"}
         </span>

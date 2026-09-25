@@ -71,7 +71,9 @@ function Layout() {
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
-            <span>✳</span>
+            <span>
+              <Icon name="spark" size="1em" />
+            </span>
             <strong>Bored is a starting point.</strong>
             <p>Something good is one yes away.</p>
             <Link to={user ? "/quiz" : "/signup"}>

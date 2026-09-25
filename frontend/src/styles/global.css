@@ -15,6 +15,8 @@
 }
 body {
   margin: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 button,
 input,
@@ -720,6 +722,7 @@ em {
   height: 240px;
 }
 .art-symbol {
+  display: flex;
   font-size: 100px;
   line-height: 1;
   transform: rotate(-10deg);
@@ -1792,15 +1795,23 @@ pre {
   }
 }
 @media (max-width: 650px) {
+  :root {
+    --mobile-nav-height: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+  html {
+    scroll-padding-bottom: calc(var(--mobile-nav-height) + 16px);
+  }
   .sidebar {
     position: fixed;
     inset: auto 0 0;
     width: 100%;
-    height: 65px;
+    height: var(--mobile-nav-height);
     display: block;
     border-right: 0;
     border-top: 1px solid var(--border);
-    padding: 4px 7px;
+    padding: 6px max(7px, env(safe-area-inset-right))
+      calc(6px + env(safe-area-inset-bottom))
+      max(7px, env(safe-area-inset-left));
     background: #fffefbf5;
     backdrop-filter: blur(12px);
   }
@@ -1816,26 +1827,33 @@ pre {
     justify-content: space-around;
   }
   .sidebar nav a {
-    font-size: 8px;
+    font-size: 10px;
     display: flex;
     flex-direction: column;
     padding: 7px 6px;
     gap: 4px;
     border-radius: 7px;
     flex: 1;
+    min-width: 0;
+    min-height: 59px;
     white-space: nowrap;
   }
   .sidebar nav svg {
-    width: 19px;
-    height: 19px;
+    width: 22px;
+    height: 22px;
   }
   .workspace {
     margin-left: 0;
-    padding-bottom: 65px;
+    padding-bottom: var(--mobile-nav-height);
   }
   .topbar {
-    height: 69px;
-    padding: 0 20px;
+    height: auto;
+    min-height: calc(72px + env(safe-area-inset-top));
+    padding: calc(10px + env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right)) 10px
+      max(16px, env(safe-area-inset-left));
+    gap: 12px;
+    flex-wrap: wrap;
   }
   .breadcrumb {
     display: none;
@@ -1843,7 +1861,7 @@ pre {
   .mobile-brand {
     display: block;
     font:
-      750 18px Manrope,
+      750 17px Manrope,
       sans-serif;
     letter-spacing: -0.8px;
   }
@@ -1851,17 +1869,31 @@ pre {
     gap: 12px;
   }
   .account .text-link {
-    font-size: 11px;
+    font-size: 12px;
+    min-height: 44px;
+    align-items: center;
   }
   .account .btn {
     padding: 8px 10px;
-    font-size: 10px;
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .account .btn svg {
+    display: none;
+  }
+  .icon-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .account .user-link {
+    min-height: 44px;
   }
   .account .user-link > span:last-child {
     display: none;
   }
   .main-content {
-    padding: 23px 18px 33px;
+    padding: 23px max(18px, env(safe-area-inset-right)) 33px
+      max(18px, env(safe-area-inset-left));
   }
   .page-eyebrow {
     font-size: 10px;
@@ -1881,7 +1913,7 @@ pre {
     font-size: 12px;
   }
   .hero {
-    min-height: 510px;
+    min-height: 0;
     display: block;
   }
   .hero-copy {
@@ -1889,7 +1921,7 @@ pre {
     padding: 25px 24px;
   }
   .hero h2 {
-    font-size: 35px;
+    font-size: clamp(28px, 8vw, 35px);
   }
   .hero-copy > p {
     font-size: 12px;
@@ -1898,34 +1930,51 @@ pre {
     display: none;
   }
   .hero-art {
-    position: absolute;
-    bottom: -70px;
-    right: -24px;
-    width: 270px;
-    height: 300px;
-    transform: scale(0.75);
-    transform-origin: center;
+    position: relative;
+    bottom: auto;
+    right: auto;
+    width: 100%;
+    min-width: 0;
+    height: 240px;
+    pointer-events: none;
   }
   .hero-copy .btn {
     margin-top: 19px;
   }
   .hero-circle {
+    width: 240px;
+    height: 240px;
+    left: calc(50% - 120px);
     top: 20px;
   }
   .hero-orbit {
+    width: 290px;
+    height: 200px;
+    left: calc(50% - 145px);
     top: 40px;
   }
+  .mini-card {
+    width: 140px;
+    height: 180px;
+    padding: 15px;
+  }
+  .mini-card > span {
+    font-size: 50px;
+  }
+  .mini-card strong {
+    font-size: 15px;
+  }
   .mini-card.back {
-    top: 50px;
-    left: -25px;
+    top: 30px;
+    left: calc(50% - 130px);
   }
   .mini-card.front {
     top: 20px;
-    left: 135px;
+    left: calc(50% - 4px);
   }
   .hero-spark {
-    top: -24px;
-    left: -60px;
+    top: 0;
+    left: 20px;
   }
   .stats-strip {
     gap: 9px;
@@ -1975,7 +2024,8 @@ pre {
   }
   .category {
     flex-shrink: 0;
-    font-size: 10px;
+    min-height: 44px;
+    font-size: 12px;
     padding: 9px 12px;
   }
   .filter-row {
@@ -1988,11 +2038,51 @@ pre {
     flex-basis: 100%;
   }
   .checkbox-label {
-    font-size: 10px !important;
+    font-size: 12px !important;
+    min-height: 44px;
+  }
+  input,
+  select,
+  textarea,
+  .search-field input,
+  .filter-row .duration-filter {
+    font-size: 16px;
+  }
+  .search-field input {
+    min-height: 46px;
+  }
+  .filter-row .duration-filter {
+    max-width: none;
+    min-height: 44px;
+  }
+  .filter-row .surprise-button {
+    min-height: 44px;
+    font-size: 12px;
+  }
+  .result-count {
+    font-size: 12px;
   }
   .activity-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+  }
+  .activity-card {
+    flex-direction: row;
+    align-items: flex-start;
+    border-radius: 14px;
+  }
+  .activity-card > .activity-art {
+    width: clamp(72px, 22vw, 112px);
+    height: clamp(88px, 26vw, 120px);
+    margin: 14px 0 14px 14px;
+    border-radius: 10px;
+  }
+  .activity-card .art-symbol {
+    font-size: 48px;
+  }
+  .activity-card .art-caption,
+  .activity-card .art-star {
+    display: none;
   }
   .activity-art {
     height: 125px;
@@ -2005,24 +2095,33 @@ pre {
     letter-spacing: 1.5px;
   }
   .activity-card-body {
-    padding: 12px;
+    padding: 14px;
+    min-width: 0;
   }
   .activity-card h3 {
-    font-size: 12px;
-    margin: 8px 0;
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 6px 0;
+    overflow-wrap: anywhere;
   }
   .activity-card p {
-    font-size: 10px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .activity-card .activity-meta {
+    margin-top: 10px;
+    padding-top: 10px;
+    flex-wrap: wrap;
   }
   .activity-meta {
-    font-size: 9px;
-    gap: 8px;
+    font-size: 11px;
+    gap: 10px;
   }
   .card-arrow {
     display: none !important;
   }
   .activity-card .eyebrow {
-    font-size: 7px;
+    font-size: 9px;
     letter-spacing: 1px;
   }
   .main-footer {
@@ -2122,6 +2221,9 @@ pre {
   }
   .modal {
     padding: 22px;
+    max-height: calc(
+      100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px
+    );
   }
   .modal-heading h2 {
     font-size: 19px;
@@ -2544,18 +2646,17 @@ pre {
     gap: 9px;
   }
   .motion-toggle {
-    min-height: 30px;
-    width: 30px;
+    min-height: 44px;
+    width: 44px;
     justify-content: center;
     padding: 5px;
   }
-  .hero {
-    min-height: 540px;
-  }
   .back-to-top {
-    bottom: 80px;
+    bottom: calc(var(--mobile-nav-height) + 12px);
     right: 17px;
     padding: 11px;
+    min-width: 44px;
+    min-height: 44px;
   }
   .back-to-top span {
     display: none;
@@ -2624,4 +2725,11 @@ pre {
   height: 1px;
   overflow: hidden;
   white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  /* Keep the small-phone header on one row; signup remains on the sign-in page. */
+  .account > .btn {
+    display: none;
+  }
 }

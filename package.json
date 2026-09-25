@@ -25,6 +25,7 @@
     "dev:frontend": "npm --prefix frontend run dev",
     "build:api": "tsc",
     "test:e2e": "npm run build && node scripts/run-tests.mjs --browser",
+    "test:mobile": "npm --prefix frontend run build && playwright test --config playwright.mobile.config.ts",
     "setup": "npm ci --prefix frontend && npm run db:deploy && npm run db:seed",
     "format": "prettier --write \"backend/src/**/*.ts\" \"database/prisma/*.ts\" \"frontend/src/**/*.{ts,tsx,css}\" \"scripts/*.{ts,mjs}\" playwright.config.ts"
   },
