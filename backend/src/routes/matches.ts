@@ -85,9 +85,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
         const updated = await updateMatchStatus(id, request.user.id, status);
         return reply.send(updated);
       } catch (err: any) {
-        return reply
-          .status(400)
-          .send({ error: "Bad Request", message: err.message });
+        throw err;
       }
     },
   );
@@ -113,9 +111,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
         const result = await createShareToken(id, request.user.id);
         return reply.send(result);
       } catch (err: any) {
-        return reply
-          .status(400)
-          .send({ error: "Bad Request", message: err.message });
+        throw err;
       }
     },
   );
@@ -137,12 +133,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
 
       const match = await getSharedMatch(token);
       if (!match) {
-        return reply
-          .status(404)
-          .send({
-            error: "Not Found",
-            message: "Shared match link is invalid or expired",
-          });
+        return reply.status(404).send({
+          error: "Not Found",
+          message: "Shared match link is invalid or expired",
+        });
       }
 
       return reply.send({

@@ -1,18 +1,32 @@
 import { FormEvent, useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { register, signIn } from "../api";
 import { useAuth } from "../context/AuthContext";
 import { Brand, ErrorMessage, Icon } from "../components/UI";
 export default function AuthPage() {
   const location = useLocation();
-  const navigate = useNavigate();
   const signup = location.pathname === "/signup";
   const { user, login } = useAuth();
   const [keyMode, setKeyMode] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [show, setShow] = useState(false);
-  if (user) return <Navigate to="/" replace />;
+  const from = location.state?.from;
+  const safeFrom =
+    typeof from === "string" &&
+    from.startsWith("/") &&
+    !from.startsWith("//") &&
+    !from.includes("\\")
+      ? from
+      : null;
+  // One redirect path avoids racing the auth-state render with router navigation.
+  if (user)
+    return (
+      <Navigate
+        to={safeFrom || (signup && !user.boredomProfile ? "/quiz" : "/")}
+        replace
+      />
+    );
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -33,16 +47,7 @@ export default function AuthPage() {
                   String(form.get("password")),
                 )
             ).apiKey;
-      const u = await login(key);
-      const from = location.state?.from;
-      navigate(
-        from && from.startsWith("/") && !from.startsWith("//")
-          ? from
-          : signup && !u.boredomProfile
-            ? "/quiz"
-            : "/",
-        { replace: true },
-      );
+      await login(key);
     } catch (e) {
       setError((e as Error).message);
     } finally {

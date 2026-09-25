@@ -1,6 +1,8 @@
+import 'dotenv/config';
+import { createHash } from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient(process.env.TEST_DATABASE_URL ? { datasources: { db: { url: process.env.TEST_DATABASE_URL } } } : undefined);
+const prisma = new PrismaClient();
 
 const activities = [
   // Creative (1-25)
@@ -206,8 +208,10 @@ async function main() {
   // Preserve existing matches and swipes when seeding again.
   
   for (const activity of activities) {
-    const existing = await prisma.activity.findFirst({ where: { title: activity.title } });
-    if (!existing) await prisma.activity.create({ data: activity });
+    const seedKey = createHash("sha256").update(activity.title).digest("hex");
+    await prisma.activity.upsert({
+      where: { seedKey }, update: {}, create: { ...activity, seedKey },
+    });
   }
   
   console.log(`Successfully seeded ${activities.length} activities!`);

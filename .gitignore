@@ -1,9 +1,24 @@
+# Dependencies and generated output
 node_modules/
 dist/
-backend/dist/
-frontend/dist/
-.env
-.env.*
+release/
+test-results/
+playwright-report/
+
+# Local credentials and tooling
+.env*
 !.env.example
+.vercel/
+.agents/
+.codex/
+skills-lock.json
+
+# Preserve local SQLite data without committing it
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS and debug files
 .DS_Store
 npm-debug.log*

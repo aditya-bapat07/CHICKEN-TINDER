@@ -1,6 +1,9 @@
 import { spawn } from "node:child_process";
+const apiPort = process.env.PORT || process.env.API_PORT || "3000";
+const childEnv = { ...process.env, API_PORT: apiPort };
 const processes = [
   spawn(process.execPath, ["--import", "tsx", "--watch", "backend/src/server.ts"], {
+    env: childEnv,
     stdio: "inherit",
   }),
   spawn(
@@ -10,7 +13,7 @@ const processes = [
       "--host",
       "127.0.0.1",
     ],
-    { cwd: process.cwd() + "/frontend", stdio: "inherit" },
+    { cwd: process.cwd() + "/frontend", env: childEnv, stdio: "inherit" },
   ),
 ];
 // Vite's script path is absolute because its working directory is the frontend.

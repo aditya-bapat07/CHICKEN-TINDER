@@ -1,3 +1,4 @@
+import { RequestError } from "../lib/errors.js";
 import { db } from "../lib/db.js";
 
 const FORCE_THRESHOLD = 10;
@@ -57,33 +58,27 @@ export async function handleSwipe(
   direction: "like" | "reject",
 ) {
   return db.$transaction(async (tx) => {
+    // Serialize writes for this user, including session creation/end, on PostgreSQL.
+    await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${userId} FOR UPDATE`;
     const session = await tx.swipeSession.findUnique({
       where: { id: sessionId },
     });
     if (!session || session.userId !== userId || session.endedAt) {
-      throw new Error("Session not found or invalid");
+      throw new RequestError("Session not found or invalid");
     }
 
     const activity = await tx.activity.findUnique({
       where: { id: activityId },
     });
-    if (!activity) throw new Error("Activity not found");
+    if (!activity) throw new RequestError("Activity not found");
     const duplicate = await tx.swipe.findUnique({
       where: { userId_activityId: { userId, activityId } },
     });
-    if (duplicate) throw new Error("You already swiped on this activity");
+    if (duplicate)
+      throw new RequestError("You already swiped on this activity");
 
-    const recentSwipes = await tx.swipe.findMany({
-      where: { sessionId },
-      orderBy: { createdAt: "asc" },
-    });
-
-    // Count consecutive rejects from the end
-    let streak = 0;
-    for (let i = recentSwipes.length - 1; i >= 0; i--) {
-      if (recentSwipes[i].direction === "reject") streak++;
-      else break;
-    }
+    const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
+    const streak = user.streakRejects;
 
     let finalDirection: "like" | "reject" | "forced_accept" = direction;
     let forced = false;
@@ -93,7 +88,9 @@ export async function handleSwipe(
       forced = true;
       await tx.swipeSession.update({
         where: { id: sessionId },
-        data: { forcedAt: recentSwipes.length + 1 },
+        data: {
+          forcedAt: (await tx.swipe.count({ where: { sessionId } })) + 1,
+        },
       });
     }
 

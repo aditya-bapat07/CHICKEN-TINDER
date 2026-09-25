@@ -1,3 +1,4 @@
+import { RequestError } from "../lib/errors.js";
 import crypto from "node:crypto";
 import { db } from "../lib/db.js";
 
@@ -34,7 +35,7 @@ export async function updateMatchStatus(
 ) {
   const match = await db.match.findUnique({ where: { id: matchId } });
   if (!match || match.userId !== userId) {
-    throw new Error("Match not found or unauthorized");
+    throw new RequestError("Match not found or unauthorized");
   }
 
   return db.match.update({
@@ -50,26 +51,27 @@ export async function updateMatchStatus(
 export async function createShareToken(matchId: string, userId: string) {
   const match = await db.match.findUnique({ where: { id: matchId } });
   if (!match || match.userId !== userId) {
-    throw new Error("Match not found or unauthorized");
+    throw new RequestError("Match not found or unauthorized");
   }
 
   if (match.shareToken) {
     return {
       shareToken: match.shareToken,
-      link: `/shared/${match.shareToken}`,
+      link: `/invite/${match.shareToken}`,
     };
   }
 
   const token = crypto.randomBytes(8).toString("hex");
 
-  const updated = await db.match.update({
-    where: { id: matchId },
+  await db.match.updateMany({
+    where: { id: matchId, userId, shareToken: null },
     data: { shareToken: token },
   });
+  const updated = await db.match.findUniqueOrThrow({ where: { id: matchId } });
 
   return {
     shareToken: updated.shareToken,
-    link: `/shared/${updated.shareToken}`,
+    link: `/invite/${updated.shareToken}`,
   };
 }
 

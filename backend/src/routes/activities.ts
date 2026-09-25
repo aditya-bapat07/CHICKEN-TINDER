@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 import { db } from "../lib/db.js";
+import { consumeLimit } from "../lib/rate-limit.js";
 
 export async function activityRoutes(fastify: FastifyInstance) {
   const server = fastify.withTypeProvider<ZodTypeProvider>();
@@ -94,6 +95,7 @@ export async function activityRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
+      await consumeLimit("activities", request.user.id, 10, 3600);
       const newActivity = await db.activity.create({
         data: request.body,
       });

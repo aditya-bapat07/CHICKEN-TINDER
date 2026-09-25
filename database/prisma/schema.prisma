@@ -1,6 +1,7 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -29,9 +30,13 @@ model ApiKey {
   label     String?   // "phone", "laptop"
   lastUsed  DateTime?
   revoked   Boolean   @default(false)
+  kind      String    @default("personal")
+  expiresAt DateTime?
   createdAt DateTime  @default(now())
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Activity {
@@ -45,6 +50,7 @@ model Activity {
   durationMin Int
   embedding   String?  // vector embeddings stored as JSON/string if needed
   createdAt   DateTime @default(now())
+  seedKey     String?  @unique
 
   swipes      Swipe[]
   matches     Match[]
@@ -59,6 +65,8 @@ model SwipeSession {
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   swipes    Swipe[]
+
+  @@index([userId, endedAt])
 }
 
 model Swipe {
@@ -74,6 +82,7 @@ model Swipe {
   session    SwipeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@unique([userId, activityId]) // no double-swiping
+  @@index([sessionId, createdAt])
 }
 
 model Match {
@@ -87,4 +96,14 @@ model Match {
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   activity    Activity  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model RateLimit {
+  key       String   @id
+  count     Int
+  expiresAt DateTime
+
+  @@index([expiresAt])
 }

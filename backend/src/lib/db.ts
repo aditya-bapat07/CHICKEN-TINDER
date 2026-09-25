@@ -1,7 +1,7 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 
-export const db = new PrismaClient(
-  process.env.TEST_DATABASE_URL
-    ? { datasources: { db: { url: process.env.TEST_DATABASE_URL } } }
-    : undefined,
-);
+// Reuse the client/pool across requests in a warm serverless instance.
+const globalDb = globalThis as unknown as { chickenDb?: PrismaClient };
+export const db = globalDb.chickenDb ?? new PrismaClient();
+globalDb.chickenDb = db;

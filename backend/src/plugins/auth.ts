@@ -48,21 +48,28 @@ export const authPlugin = fp(async (fastify: FastifyInstance) => {
         include: { user: true },
       });
 
-      if (!apiKeyRecord || apiKeyRecord.revoked) {
-        return reply
-          .status(401)
-          .send({
-            error: "Unauthorized",
-            message: "Invalid or revoked API key",
-          });
+      if (
+        !apiKeyRecord ||
+        apiKeyRecord.revoked ||
+        (apiKeyRecord.expiresAt && apiKeyRecord.expiresAt <= new Date())
+      ) {
+        return reply.status(401).send({
+          error: "Unauthorized",
+          message: "Invalid or revoked API key",
+        });
       }
 
-      db.apiKey
-        .update({
-          where: { id: apiKeyRecord.id },
-          data: { lastUsed: new Date() },
-        })
-        .catch(() => {});
+      if (
+        !apiKeyRecord.lastUsed ||
+        Date.now() - apiKeyRecord.lastUsed.getTime() > 60_000
+      ) {
+        await db.apiKey
+          .update({
+            where: { id: apiKeyRecord.id },
+            data: { lastUsed: new Date() },
+          })
+          .catch(() => {});
+      }
 
       request.user = {
         id: apiKeyRecord.user.id,

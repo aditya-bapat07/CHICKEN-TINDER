@@ -31,6 +31,7 @@ export interface ApiKey {
   lastUsed: string | null;
   createdAt: string;
   revoked: boolean;
+  expired: boolean;
   current: boolean;
 }
 export interface Question {

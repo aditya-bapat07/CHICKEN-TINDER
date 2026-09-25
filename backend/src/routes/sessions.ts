@@ -28,6 +28,7 @@ export async function sessionRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const session = await db.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${request.user.id} FOR UPDATE`;
         const active = await tx.swipeSession.findFirst({
           where: { userId: request.user.id, endedAt: null },
           orderBy: { startedAt: "desc" },
@@ -144,9 +145,7 @@ export async function sessionRoutes(fastify: FastifyInstance) {
         );
         return reply.send(result);
       } catch (err: any) {
-        return reply
-          .status(400)
-          .send({ error: "Bad Request", message: err.message });
+        throw err;
       }
     },
   );
@@ -175,9 +174,12 @@ export async function sessionRoutes(fastify: FastifyInstance) {
           .send({ error: "Not Found", message: "Session not found" });
       }
 
-      const updated = await db.swipeSession.update({
-        where: { id },
-        data: { endedAt: new Date() },
+      const updated = await db.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT "id" FROM "User" WHERE "id" = ${request.user.id} FOR UPDATE`;
+        return tx.swipeSession.update({
+          where: { id },
+          data: { endedAt: new Date() },
+        });
       });
 
       return reply.send({

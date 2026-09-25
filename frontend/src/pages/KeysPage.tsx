@@ -112,12 +112,14 @@ export default function KeysPage() {
                   ? new Date(key.lastUsed).toLocaleDateString()
                   : "Not used yet"}
               </span>
-              <span className={`badge ${key.revoked ? "skipped" : "done"}`}>
-                {key.revoked ? "Revoked" : "Active"}
+              <span
+                className={`badge ${key.revoked || key.expired ? "skipped" : "done"}`}
+              >
+                {key.revoked ? "Revoked" : key.expired ? "Expired" : "Active"}
               </span>
               <button
                 className="text-button danger"
-                disabled={key.revoked || busy}
+                disabled={key.revoked || key.expired || busy}
                 onClick={() => {
                   setError("");
                   setRevoke(key);

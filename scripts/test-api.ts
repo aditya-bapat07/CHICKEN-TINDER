@@ -101,6 +101,11 @@ async function runTests() {
       password: "new-password-123",
       currentPassword: "sunshine-test-123",
     });
+    await call("GET", "/api/me", 401, login.apiKey);
+    const freshLogin = await call("POST", "/api/auth/login", 200, undefined, {
+      email: me.email,
+      password: "new-password-123",
+    });
     await call("POST", "/api/auth/login", 401, undefined, {
       email: me.email,
       password: "sunshine-test-123",
@@ -131,8 +136,8 @@ async function runTests() {
     await call("GET", "/api/me", 200, newKey.apiKey);
     await call("DELETE", `/api/auth/keys/${newKey.id}`, 200, key);
     await call("GET", "/api/me", 401, newKey.apiKey);
-    await call("POST", "/api/auth/logout", 200, login.apiKey);
-    await call("GET", "/api/me", 401, login.apiKey);
+    await call("POST", "/api/auth/logout", 200, freshLogin.apiKey);
+    await call("GET", "/api/me", 401, freshLogin.apiKey);
     const activities = await call("GET", "/api/activities");
     assert(activities.length >= 20);
     const filtered = await call("GET", "/api/activities?category=creative");
@@ -198,6 +203,15 @@ async function runTests() {
     );
     const publicMatch = await call("GET", `/api/shared/${shared.shareToken}`);
     assert.equal(publicMatch.sharedBy, "Updated Adventurer");
+    assert.equal(shared.link, `/invite/${shared.shareToken}`);
+    const invitation = await app.inject({
+      method: "GET",
+      url: shared.link,
+      headers: { accept: "text/html" },
+    });
+    assert.equal(invitation.statusCode, 200);
+    assert(invitation.payload.includes('<div id="root">'));
+    count++;
     const recap = await call("GET", `/api/sessions/${id}/summary`, 200, key);
     assert.equal(recap.totalSwipes, 20);
     assert.equal(recap.forced, 2);
@@ -214,6 +228,36 @@ async function runTests() {
     });
     // Legacy API clients still work.
     await call("GET", "/me", 200, key);
+    // Query strings must not bypass credential throttling on either API prefix.
+    for (const prefix of ["/api", ""]) {
+      let limited = false;
+      for (let i = 0; i < 21; i++) {
+        const response = await app.inject({
+          method: "POST",
+          url: `${prefix}/auth/login`,
+          payload: { email: "unknown@example.com", password: "incorrect" },
+        });
+        if (response.statusCode === 429) {
+          limited = true;
+          break;
+        }
+        assert.equal(response.statusCode, 401);
+      }
+      assert(limited, "Credential attempts must be rate limited");
+      for (const endpoint of ["login", "register"]) {
+        await call(
+          "POST",
+          `${prefix}/auth/${endpoint}?attempt=1`,
+          429,
+          undefined,
+          {
+            email: "unknown@example.com",
+            name: "Rate limit regression",
+            password: "incorrect",
+          },
+        );
+      }
+    }
     console.log(
       `Passed ${count} API checks: auth, credentials, keys, profile, activities, sessions, ownership, forced matches, sharing and leaderboard.`,
     );

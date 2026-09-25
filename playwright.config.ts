@@ -5,7 +5,7 @@ export default defineConfig({
   workers: 1,
   use: {
     baseURL: "http://127.0.0.1:3100",
-    channel: "chrome",
+    channel: process.env.CI ? undefined : "chrome",
     headless: true,
     actionTimeout: 12_000,
     viewport: { width: 1440, height: 1000 },
