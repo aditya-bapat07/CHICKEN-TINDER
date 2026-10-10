@@ -23,7 +23,7 @@ assert.equal(health.status, 200, "Database readiness failed");
 assert.equal((await health.json()).database, "connected");
 const catalog = await get("/api/activities");
 assert.equal(catalog.status, 200);
-assert((await catalog.json()).length >= 185, "The catalog has not been seeded");
+assert((await catalog.json()).length >= 250, "The catalog has not been seeded");
 for (const path of [
   "/",
   "/signup",

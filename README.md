@@ -1,6 +1,6 @@
 # Chicken Tinder
 
-A complete activity discovery app with a React frontend, Fastify API, and PostgreSQL database. Deployment instructions are in [DEPLOYMENT.md](DEPLOYMENT.md). Browse 185 seeded activities, personalize your mood, swipe on ideas, save matches, share invitations, and manage your account and API keys.
+A complete activity discovery app with a React frontend, Fastify API, and PostgreSQL database. Deployment instructions are in [DEPLOYMENT.md](DEPLOYMENT.md). Browse 250 seeded activities, personalize your mood, swipe on ideas, save matches, share invitations, and manage your account and API keys.
 
 Public website: **https://v0-chicken-tinder.vercel.app**. Production runs on Vercel with a dedicated Neon PostgreSQL database. The original SQLite file remains local and has not been imported.
 
@@ -18,7 +18,7 @@ npm run dev
 
 Open **http://localhost:5173**. This starts the frontend and API together. The API runs at **http://localhost:3000**, with interactive documentation at **http://localhost:3000/docs**. Vite proxies `/api` and `/docs` to the API.
 
-Setup applies committed PostgreSQL migrations and seeds 185 activities idempotently. Configure `DATABASE_URL` and `DIRECT_URL` in `.env` when using an external database. The old `database/prisma/dev.db` is preserved locally as an untracked archive; it is no longer used. Its accounts and matches are not automatically copied to PostgreSQL.
+Setup applies committed PostgreSQL migrations and seeds 250 activities idempotently. Configure `DATABASE_URL` and `DIRECT_URL` in `.env` when using an external database. The old `database/prisma/dev.db` is preserved locally as an untracked archive; it is no longer used. Its accounts and matches are not automatically copied to PostgreSQL.
 
 ## Production build
 

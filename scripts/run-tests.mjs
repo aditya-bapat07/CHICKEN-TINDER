@@ -46,7 +46,7 @@ try {
     select: { id: true },
     orderBy: { id: "asc" },
   });
-  if (before.length !== 185 || JSON.stringify(before) !== JSON.stringify(after))
+  if (before.length !== 250 || JSON.stringify(before) !== JSON.stringify(after))
     throw new Error("Seed is not idempotent");
   if (process.argv.includes("--browser"))
     run(["node_modules/@playwright/test/cli.js", "test"]);

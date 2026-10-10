@@ -4,7 +4,7 @@ The repository is configured for a single Vercel project with a static React fro
 
 ## Current production website
 
-Published September 25, 2026: **https://v0-chicken-tinder.vercel.app**. The `chicken-tinder` Vercel project is connected to a dedicated Neon database on its free plan, with all 185 catalog activities initialized. Production database variables are already configured; no setup is needed to use this website. The original SQLite file remains on disk and its accounts/history have not been imported.
+Published September 25, 2026: **https://v0-chicken-tinder.vercel.app**. The `chicken-tinder` Vercel project is connected to a dedicated Neon database on its free plan, with all 250 catalog activities initialized. Production database variables are already configured; no setup is needed to use this website. The original SQLite file remains on disk and its accounts/history have not been imported.
 
 The steps below describe setup for a new project or separate preview environment. A separate preview database has not been provisioned for this project. The published production site uses its dedicated production database.
 
@@ -23,7 +23,7 @@ Keep preview and production databases separate. Do not give preview deployments 
 
 ## 2. Database initialization is automatic
 
-The Vercel build runs `npm run vercel:build`: it checks both database URLs, compiles the app, applies the committed PostgreSQL migrations, and seeds all 185 catalog activities. No manual migration or seed command is required for a fresh deployment. Any failed step stops the deployment.
+The Vercel build runs `npm run vercel:build`: it checks both database URLs, compiles the app, applies the committed PostgreSQL migrations, and seeds all 250 catalog activities. No manual migration or seed command is required for a fresh deployment. Any failed step stops the deployment.
 
 Seeding uses stable keys and is safe to repeat; it preserves existing IDs, matches, and swipes. Build environments must each use their own intended database. Preview builds must never receive production database credentials. Future production migrations should remain backward-compatible with the currently running app until deployment completes.
 
