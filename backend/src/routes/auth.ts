@@ -5,6 +5,7 @@ import { db } from "../lib/db.js";
 import { generateApiKey, hashApiKey } from "../lib/apikey.js";
 import { hashPassword, verifyPassword } from "../lib/password.js";
 import { clientIp, consumeLimit } from "../lib/rate-limit.js";
+import crypto from "node:crypto";
 
 const emailSchema = z
   .string()
@@ -12,6 +13,16 @@ const emailSchema = z
   .email()
   .transform((v) => v.toLowerCase());
 const passwordSchema = z.string().min(8).max(128);
+const usernameSchema = z
+  .string()
+  .trim()
+  .min(3)
+  .max(24)
+  .regex(
+    /^[a-zA-Z0-9_]+$/,
+    "Username can use letters, numbers, and underscores.",
+  )
+  .transform((value) => value.toLowerCase());
 
 export async function authRoutes(fastify: FastifyInstance) {
   const server = fastify.withTypeProvider<ZodTypeProvider>();
@@ -32,12 +43,22 @@ export async function authRoutes(fastify: FastifyInstance) {
         body: z.object({
           email: emailSchema,
           name: z.string().trim().min(1).max(80),
+          username: usernameSchema.optional(),
           password: passwordSchema.optional(),
         }),
       },
     },
     async (request, reply) => {
       const { email, name, password } = request.body;
+      const nameSlug =
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_|_$/g, "")
+          .slice(0, 16) || "member";
+      const username =
+        request.body.username ||
+        `${nameSlug}_${crypto.randomUUID().slice(0, 6)}`;
       const existing = await db.user.findFirst({
         where: { email: { equals: email } },
       });
@@ -51,6 +72,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           data: {
             email,
             name,
+            username,
             passwordHash: password ? await hashPassword(password) : null,
             apiKeys: {
               create: {

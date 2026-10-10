@@ -24,6 +24,7 @@ export async function meRoutes(fastify: FastifyInstance) {
             id: z.string(),
             email: z.string(),
             name: z.string(),
+            username: z.string(),
             boredomProfile: z
               .object({
                 energy: z.number(),
@@ -54,6 +55,7 @@ export async function meRoutes(fastify: FastifyInstance) {
         id: user.id,
         email: user.email,
         name: user.name,
+        username: user.username,
         boredomProfile: user.boredomProfile as any,
         streakRejects: user.streakRejects,
         hasPassword: Boolean(user.passwordHash),
@@ -73,6 +75,17 @@ export async function meRoutes(fastify: FastifyInstance) {
         security: [{ apiKey: [] }],
         body: z.object({
           name: z.string().trim().min(1).max(80).optional(),
+          username: z
+            .string()
+            .trim()
+            .min(3)
+            .max(24)
+            .regex(
+              /^[a-zA-Z0-9_]+$/,
+              "Username can use letters, numbers, and underscores.",
+            )
+            .transform((value) => value.toLowerCase())
+            .optional(),
           boredomProfile: z
             .object({
               energy: z.number().min(1).max(5),
@@ -85,6 +98,7 @@ export async function meRoutes(fastify: FastifyInstance) {
           200: z.object({
             id: z.string(),
             name: z.string(),
+            username: z.string(),
             boredomProfile: z
               .object({
                 energy: z.number(),
@@ -97,12 +111,13 @@ export async function meRoutes(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { name, boredomProfile } = request.body;
+      const { name, username, boredomProfile } = request.body;
 
       const updated = await db.user.update({
         where: { id: request.user.id },
         data: {
           ...(name ? { name } : {}),
+          ...(username ? { username } : {}),
           ...(boredomProfile ? { boredomProfile } : {}),
         },
       });
@@ -110,6 +125,7 @@ export async function meRoutes(fastify: FastifyInstance) {
       return reply.send({
         id: updated.id,
         name: updated.name,
+        username: updated.username,
         boredomProfile: updated.boredomProfile as any,
       });
     },

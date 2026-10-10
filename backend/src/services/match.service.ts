@@ -105,14 +105,14 @@ export async function getLeaderboard() {
   const userIds = usersWithForcedMatches.map((u) => u.userId);
   const users = await db.user.findMany({
     where: { id: { in: userIds } },
-    select: { id: true, name: true },
+    select: { id: true, username: true },
   });
 
   return usersWithForcedMatches.map((item) => {
     const user = users.find((u) => u.id === item.userId);
     return {
       userId: item.userId,
-      userName: user?.name || "Anonymous",
+      userName: user?.username || "Anonymous",
       forcedMatchesCount: item._count.id,
     };
   });

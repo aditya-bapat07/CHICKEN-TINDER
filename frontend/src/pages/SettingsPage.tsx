@@ -1,10 +1,12 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { patchMe, setPassword } from "../api";
+import { patchMe, setPassword, getMatches } from "../api";
 import { useAuth } from "../context/AuthContext";
-import { ErrorMessage, Icon } from "../components/UI";
+import { ErrorMessage, Icon, useLoad } from "../components/UI";
+import AdventureRPG from "../components/AdventureRPG";
 export default function SettingsPage() {
   const { user, refreshUser } = useAuth();
+  const matches = useLoad(async () => (user ? getMatches() : []), [user?.id]);
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -22,6 +24,7 @@ export default function SettingsPage() {
       if (kind === "profile")
         await patchMe({
           name: String(f.get("name")),
+          username: String(f.get("username")),
           boredomProfile: {
             energy: Number(f.get("energy")),
             budget: Number(f.get("budget")),
@@ -78,6 +81,20 @@ export default function SettingsPage() {
               required
               maxLength={80}
             />
+          </label>
+          <label>
+            Username
+            <input
+              name="username"
+              defaultValue={user?.username}
+              required
+              minLength={3}
+              maxLength={24}
+              pattern="[A-Za-z0-9_]+"
+            />
+            <span className="field-help">
+              Displayed on the leaderboard and in private messages.
+            </span>
           </label>
           <label>
             Email address
@@ -189,6 +206,9 @@ export default function SettingsPage() {
             </Link>
           </div>
         </div>
+      </div>
+      <div style={{ marginTop: "40px" }}>
+        <AdventureRPG matches={matches.data || []} />
       </div>
     </>
   );

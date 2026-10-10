@@ -5,19 +5,12 @@ import { Icon } from "./UI";
 /** Motion is progressive enhancement: content stays visible without observers. */
 export default function ScrollEffects() {
   const { pathname } = useLocation();
-  const [paused, setPaused] = useState(() => {
-    try {
-      return localStorage.getItem("ct_motion_paused") === "true";
-    } catch {
-      return false;
-    }
-  });
   const [systemReduced, setSystemReduced] = useState(
     () => matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const [showTop, setShowTop] = useState(false);
   const progress = useRef<HTMLDivElement>(null);
-  const reduced = paused || systemReduced;
+  const reduced = systemReduced;
 
   useEffect(() => {
     const query = matchMedia("(prefers-reduced-motion: reduce)");
@@ -137,45 +130,11 @@ export default function ScrollEffects() {
     };
   }, [pathname, reduced]);
 
-  function toggle() {
-    const next = !paused;
-    setPaused(next);
-    try {
-      localStorage.setItem("ct_motion_paused", String(next));
-    } catch {
-      /* Remains available for this visit. */
-    }
-  }
   return (
     <>
       <div className="scroll-progress" aria-hidden="true">
         <div ref={progress} />
       </div>
-      <button
-        className="motion-toggle"
-        onClick={toggle}
-        disabled={systemReduced}
-        aria-pressed={reduced}
-        aria-label={
-          systemReduced
-            ? "Animations disabled by system preference"
-            : "Pause animations"
-        }
-        title={
-          systemReduced
-            ? "Reduced motion is enabled on your device"
-            : reduced
-              ? "Resume animations"
-              : "Pause animations"
-        }
-      >
-        <span aria-hidden="true">
-          {reduced ? "Ⅱ" : <Icon name="spark" size="1em" />}
-        </span>
-        <span className="motion-toggle-label">
-          {reduced ? "Motion off" : "Motion on"}
-        </span>
-      </button>
       {showTop && (
         <button
           className="back-to-top"

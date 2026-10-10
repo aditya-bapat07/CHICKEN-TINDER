@@ -7,6 +7,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  username: string;
   boredomProfile: Profile | null;
   streakRejects: number;
   hasPassword: boolean;
@@ -97,10 +98,15 @@ const post = (body?: unknown): RequestInit => ({
   method: "POST",
   ...(body === undefined ? {} : { body: JSON.stringify(body) }),
 });
-export const register = (email: string, name: string, password: string) =>
+export const register = (
+  email: string,
+  name: string,
+  username: string,
+  password: string,
+) =>
   req<{ apiKey: string }>(
     "/auth/register",
-    post({ email, name, password }),
+    post({ email, name, username, password }),
     false,
   );
 export const signIn = (email: string, password: string) =>
@@ -108,8 +114,11 @@ export const signIn = (email: string, password: string) =>
 export const getMe = (key?: string) =>
   req<User>("/me", key ? { headers: { "x-api-key": key } } : {});
 export const signOut = () => req("/auth/logout", post());
-export const patchMe = (body: { name?: string; boredomProfile?: Profile }) =>
-  req<User>("/me", { method: "PATCH", body: JSON.stringify(body) });
+export const patchMe = (body: {
+  name?: string;
+  username?: string;
+  boredomProfile?: Profile;
+}) => req<User>("/me", { method: "PATCH", body: JSON.stringify(body) });
 export const setPassword = (password: string, currentPassword?: string) =>
   req("/auth/password", {
     method: "PUT",
@@ -157,6 +166,37 @@ export const getLeaderboard = () =>
     "/leaderboard",
     {},
     false,
+  );
+export interface ChatPerson {
+  id: string;
+  name: string;
+  username: string;
+}
+export interface DirectMessage {
+  id: string;
+  body: string;
+  createdAt: string;
+  sender: { id: string; username: string };
+}
+export interface ChatConversation {
+  id: string;
+  otherUser: ChatPerson;
+  lastMessage: DirectMessage | null;
+}
+export const getChatPeople = (search = "") =>
+  req<ChatPerson[]>(
+    `/chat/people${search ? `?search=${encodeURIComponent(search)}` : ""}`,
+  );
+export const getChatConversations = () =>
+  req<ChatConversation[]>("/chat/conversations");
+export const createChatConversation = (userId: string) =>
+  req<ChatConversation>("/chat/conversations", post({ userId }));
+export const getChatMessages = (conversationId: string) =>
+  req<DirectMessage[]>(`/chat/conversations/${conversationId}/messages`);
+export const sendChatMessage = (conversationId: string, body: string) =>
+  req<DirectMessage>(
+    `/chat/conversations/${conversationId}/messages`,
+    post({ body }),
   );
 export const getKeys = () => req<ApiKey[]>("/auth/keys");
 export const generateKey = (label: string) =>

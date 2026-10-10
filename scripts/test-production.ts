@@ -178,7 +178,7 @@ async function main() {
       }
       assert.equal((await fetch(origin + "/api/health")).status, 200);
       const newActivity = await db.activity.findFirstOrThrow({
-        where: { id: { notIn: activities.map(a => a.id) } },
+        where: { id: { notIn: activities.map((a) => a.id) } },
       });
       const vote = await fetch(origin + `/api/sessions/${sessionId}/swipe`, {
         method: "POST",

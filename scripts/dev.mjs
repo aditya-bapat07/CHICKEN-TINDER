@@ -2,10 +2,14 @@ import { spawn } from "node:child_process";
 const apiPort = process.env.PORT || process.env.API_PORT || "3000";
 const childEnv = { ...process.env, API_PORT: apiPort };
 const processes = [
-  spawn(process.execPath, ["--import", "tsx", "--watch", "backend/src/server.ts"], {
-    env: childEnv,
-    stdio: "inherit",
-  }),
+  spawn(
+    process.execPath,
+    ["--import", "tsx", "--watch", "backend/src/server.ts"],
+    {
+      env: childEnv,
+      stdio: "inherit",
+    },
+  ),
   spawn(
     process.execPath,
     [

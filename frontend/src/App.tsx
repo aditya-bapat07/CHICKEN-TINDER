@@ -20,11 +20,16 @@ import LeaderboardPage from "./pages/LeaderboardPage";
 import SharedPage from "./pages/SharedPage";
 import KeysPage from "./pages/KeysPage";
 import SettingsPage from "./pages/SettingsPage";
+import ChatPage from "./pages/ChatPage";
+import PartyPage from "./pages/PartyPage";
+import ThemeToggle from "./components/ThemeToggle";
 const nav = [
   ["/", "discover", "Discover"],
   ["/activities", "grid", "All activities"],
   ["/matches", "heart", "My matches"],
+  ["/party", "party", "Party room"],
   ["/leaderboard", "trophy", "Leaderboard"],
+  ["/chat", "smile", "Messages"],
 ];
 function Protected() {
   const { user, loading } = useAuth();
@@ -105,6 +110,7 @@ function Layout() {
           <span className="mobile-brand">chickentinder</span>
           <div className="account">
             <ScrollEffects />
+            <ThemeToggle />
             {loading ? (
               <span className="spinner" />
             ) : user ? (
@@ -173,6 +179,7 @@ export default function App() {
       <Route element={<Layout />}>
         <Route index element={<DiscoverPage />} />
         <Route path="activities" element={<DiscoverPage catalog />} />
+        <Route path="party" element={<PartyPage />} />
         <Route path="leaderboard" element={<LeaderboardPage />} />
         <Route path="invite/:token" element={<SharedPage />} />
         <Route element={<Protected />}>
@@ -181,6 +188,7 @@ export default function App() {
           <Route path="matches" element={<MatchesPage />} />
           <Route path="keys" element={<KeysPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
         <Route
           path="*"

@@ -9,6 +9,13 @@ import {
   swipe,
 } from "../api";
 import { useAuth } from "../context/AuthContext";
+import WeatherVibe, { WeatherState } from "../components/WeatherVibe";
+import AlchemistModal from "../components/AlchemistModal";
+import {
+  getGoogleCalendarUrl,
+  getMapsSearchUrl,
+  getIngredientsChecklist,
+} from "../lib/activityActions";
 import {
   Art,
   categories,
@@ -33,22 +40,47 @@ export default function DiscoverPage({
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Activity>();
   const [adding, setAdding] = useState(false);
+  const [alchemistOpen, setAlchemistOpen] = useState(false);
+  const [checklistOpen, setChecklistOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [budget, setBudget] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [weather, setWeather] = useState<WeatherState>({
+    enabled: false,
+    type: "mild",
+    tempC: 20,
+    description: "Mild Weather",
+  });
   const filtered = useMemo(
     () =>
-      (list.data || []).filter(
-        (a) =>
-          (category === "all" || a.category === category) &&
-          (!budget || a.budget === 1) &&
-          (!duration || a.durationMin <= duration) &&
-          `${a.title} ${a.description}`
-            .toLowerCase()
-            .includes(search.toLowerCase()),
-      ),
-    [list.data, category, search, budget, duration],
+      (list.data || []).filter((a) => {
+        const matchesCategory = category === "all" || a.category === category;
+        const matchesBudget = !budget || a.budget === 1;
+        const matchesDuration = !duration || a.durationMin <= duration;
+        const matchesSearch = `${a.title} ${a.description}`
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+        let matchesWeather = true;
+        if (weather.enabled) {
+          if (weather.type === "rainy" || weather.type === "cold") {
+            matchesWeather = a.category !== "outdoor";
+          } else if (weather.type === "sunny") {
+            matchesWeather =
+              a.category === "outdoor" || a.category === "fitness";
+          }
+        }
+
+        return (
+          matchesCategory &&
+          matchesBudget &&
+          matchesDuration &&
+          matchesSearch &&
+          matchesWeather
+        );
+      }),
+    [list.data, category, search, budget, duration, weather],
   );
   const visibleActivities =
     catalog || category !== "all" || search || budget || duration
@@ -327,6 +359,16 @@ export default function DiscoverPage({
             <option value={30}>30 min or less</option>
             <option value={60}>An hour or less</option>
           </select>
+          <WeatherVibe onWeatherChange={setWeather} activeWeather={weather} />
+          <button
+            type="button"
+            className="btn secondary small"
+            onClick={() => setAlchemistOpen(true)}
+            title="Create a custom activity using items on hand"
+          >
+            <Icon name="flask" size={15} />
+            Alchemist
+          </button>
           <button
             className="btn secondary small surprise-button"
             disabled={!filtered.length || list.loading}
@@ -472,10 +514,78 @@ export default function DiscoverPage({
                 : `Social ${selected.social}/5`}
             </span>
           </div>
+          <div className="match-quick-links" style={{ margin: "16px 0 8px" }}>
+            <a
+              href={getMapsSearchUrl(selected)}
+              target="_blank"
+              rel="noreferrer"
+              className="action-chip"
+              title="Find places near you on Google Maps"
+            >
+              <Icon name="mapPin" size={13} />
+              Find nearby
+            </a>
+            <a
+              href={getGoogleCalendarUrl(selected)}
+              target="_blank"
+              rel="noreferrer"
+              className="action-chip"
+              title="Add to Google Calendar"
+            >
+              <Icon name="calendar" size={13} />
+              Google Cal
+            </a>
+            <button
+              type="button"
+              className="action-chip"
+              onClick={() => setChecklistOpen(true)}
+              title="View items & materials needed"
+            >
+              <Icon name="checklist" size={13} />
+              Checklist
+            </button>
+          </div>
           <ErrorMessage error={error} />
           <button className="btn full" onClick={saveActivity} disabled={busy}>
             {busy ? "Saving…" : "Yes, add to my matches"}
             <Icon name="heart" size={18} />
+          </button>
+        </Modal>
+      )}
+      {alchemistOpen && (
+        <AlchemistModal
+          onClose={() => setAlchemistOpen(false)}
+          onActivityCreated={() => list.reload()}
+        />
+      )}
+      {checklistOpen && selected && (
+        <Modal
+          title={`Checklist: ${selected.title}`}
+          close={() => setChecklistOpen(false)}
+        >
+          <p style={{ marginBottom: "16px" }}>
+            Recommended items and materials for this activity:
+          </p>
+          <div className="checklist-items-box">
+            {getIngredientsChecklist(selected).map((item, i) => (
+              <label key={i} className="checklist-item-row">
+                <input type="checkbox" defaultChecked={false} />
+                <span>{item}</span>
+              </label>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="btn full secondary"
+            style={{ marginTop: "16px" }}
+            onClick={() => {
+              const text = getIngredientsChecklist(selected).join("\n• ");
+              void navigator.clipboard?.writeText(
+                `Checklist for ${selected.title}:\n• ${text}`,
+              );
+            }}
+          >
+            <Icon name="copy" size={16} /> Copy Checklist to Clipboard
           </button>
         </Modal>
       )}

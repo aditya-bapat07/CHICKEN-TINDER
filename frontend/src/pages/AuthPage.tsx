@@ -40,6 +40,7 @@ export default function AuthPage() {
               ? await register(
                   String(form.get("email")),
                   String(form.get("name")),
+                  String(form.get("username")),
                   String(form.get("password")),
                 )
               : await signIn(
@@ -126,16 +127,34 @@ export default function AuthPage() {
           <form onSubmit={submit} key={`${signup}-${keyMode}`}>
             <ErrorMessage error={error} />
             {signup && (
-              <label>
-                Your name
-                <input
-                  name="name"
-                  autoComplete="name"
-                  placeholder="What should we call you?"
-                  required
-                  maxLength={80}
-                />
-              </label>
+              <>
+                <label>
+                  Your name
+                  <input
+                    name="name"
+                    autoComplete="name"
+                    placeholder="What should we call you?"
+                    required
+                    maxLength={80}
+                  />
+                </label>
+                <label>
+                  Choose a username
+                  <input
+                    name="username"
+                    autoComplete="username"
+                    placeholder="e.g. sunny_sam"
+                    required
+                    minLength={3}
+                    maxLength={24}
+                    pattern="[A-Za-z0-9_]+"
+                  />
+                  <span className="field-help">
+                    Letters, numbers, and underscores only. Others will see this
+                    name.
+                  </span>
+                </label>
+              </>
             )}
             {keyMode && !signup ? (
               <label>

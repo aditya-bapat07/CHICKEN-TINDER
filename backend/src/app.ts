@@ -15,6 +15,7 @@ import { meRoutes } from "./routes/me.js";
 import { activityRoutes } from "./routes/activities.js";
 import { sessionRoutes } from "./routes/sessions.js";
 import { matchRoutes } from "./routes/matches.js";
+import { chatRoutes } from "./routes/chat.js";
 import { db } from "./lib/db.js";
 
 dotenv.config();
@@ -69,6 +70,7 @@ export async function buildApp() {
     await server.register(activityRoutes);
     await server.register(sessionRoutes);
     await server.register(matchRoutes);
+    await server.register(chatRoutes);
   }
   await app.register(apiRoutes, { prefix: "/api" });
   // Keep the original API URLs for existing clients.
